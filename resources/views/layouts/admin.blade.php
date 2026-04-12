@@ -245,6 +245,17 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="card" style="background: #fee2e2; color: #991b1b; margin-bottom: 2rem; border: none;">
+                    <strong style="display: block; margin-bottom: 0.5rem;">There were errors with your submission:</strong>
+                    <ul style="margin-left: 1.5rem;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             @yield('content')
         </main>
     </div>

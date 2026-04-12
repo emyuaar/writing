@@ -57,6 +57,7 @@ class PageController extends Controller
             'slug' => 'required|string|unique:pages,slug,' . $page->id,
             'is_published' => 'boolean',
             'seo_metadata' => 'nullable|array',
+            'sections' => 'nullable|array',
         ]);
 
         $page->update($data);
@@ -67,7 +68,7 @@ class PageController extends Controller
 
             foreach ($request->sections as $index => $sectionData) {
                 $sectionData['sort_order'] = $index;
-                $sectionData['is_active'] = isset($sectionData['is_active']);
+                $sectionData['is_active'] = (isset($sectionData['is_active']) && $sectionData['is_active'] == '1');
 
                 if (isset($sectionData['id']) && in_array($sectionData['id'], $existingSectionIds)) {
                     $section = $page->sections()->find($sectionData['id']);
@@ -81,6 +82,10 @@ class PageController extends Controller
 
             // Cleanup removed sections
             $page->sections()->whereNotIn('id', $submittedSectionIds)->delete();
+        } else {
+            if ($request->has('sections_builder_active')) {
+                $page->sections()->delete();
+            }
         }
 
         return back()->with('success', 'Page updated successfully.');

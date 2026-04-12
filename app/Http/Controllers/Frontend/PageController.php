@@ -21,4 +21,8 @@ class PageController extends Controller
 
         return view('frontend.page', compact('page', 'seo'));
     }
+    public function contact()
+    {
+        return view('frontend.contact');
+    }
 }

@@ -17,10 +17,12 @@ use App\Http\Controllers\Frontend\PageController as FrontendPageController;
 
 Route::get('/', [FrontendPageController::class, 'show'])->name('home');
 Route::get('/p/{slug}', [FrontendPageController::class, 'show'])->name('page.show');
+Route::get('/services', [\App\Http\Controllers\Frontend\ServiceController::class, 'index'])->name('services.index');
 Route::get('/services/{slug}', [\App\Http\Controllers\Frontend\ServiceController::class, 'show'])->name('services.show');
 Route::get('/blog', [\App\Http\Controllers\Frontend\BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [\App\Http\Controllers\Frontend\BlogController::class, 'show'])->name('blog.show');
 Route::get('/pricing', [\App\Http\Controllers\Frontend\PricingController::class, 'index'])->name('pricing.index');
+Route::get('/contact-us', [FrontendPageController::class, 'contact'])->name('contact');
 Route::post('/order', [\App\Http\Controllers\Frontend\PricingController::class, 'storeOrder'])->name('order.store');
 Route::post('/inquiry', [\App\Http\Controllers\Frontend\InquiryController::class, 'store'])->name('inquiry.store');
 

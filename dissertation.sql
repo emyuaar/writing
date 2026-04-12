@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 11, 2026 at 02:03 PM
+-- Generation Time: Apr 12, 2026 at 03:39 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -68,7 +68,7 @@ CREATE TABLE `categories` (
 INSERT INTO `categories` (`id`, `name`, `slug`, `type`, `description`, `created_at`, `updated_at`) VALUES
 (1, 'Dissertation Writing', 'dissertation-writing', 'service', NULL, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
 (2, 'Editing', 'editing', 'service', NULL, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
-(3, 'Academic Tips', 'academic-tips', 'blog', NULL, '2026-04-11 07:00:55', '2026-04-11 07:00:55');
+(3, 'Exams', 'online-exams', 'service', NULL, '2026-04-11 07:00:55', '2026-04-11 07:00:55');
 
 -- --------------------------------------------------------
 
@@ -124,6 +124,15 @@ CREATE TABLE `inquiries` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inquiries`
+--
+
+INSERT INTO `inquiries` (`id`, `type`, `name`, `email`, `phone`, `subject`, `message`, `source_url`, `service_reference`, `status`, `extra_data`, `created_at`, `updated_at`) VALUES
+(1, 'cta', 'Minhaj Ur Rehman', 'minhajurrehman32@gmail.com', NULL, NULL, NULL, 'http://127.0.0.1:8000/services/doctoral-dissertation-editing', NULL, 'read', NULL, '2026-04-11 13:48:59', '2026-04-11 19:22:06'),
+(2, 'general', 'Minhaj Ur Rehman', 'minhajurrehman32@gmail.com', NULL, NULL, 'test', 'http://127.0.0.1:8000/services/full-dissertation-writing', NULL, 'read', NULL, '2026-04-11 19:21:02', '2026-04-11 19:21:57'),
+(3, 'general', 'Minhaj Ur Rehman', 'minhajurrehman32@gmail.com', NULL, NULL, 'exam help', 'http://127.0.0.1:8000/services/online-exam-help', NULL, 'read', NULL, '2026-04-11 20:28:01', '2026-04-11 20:28:10');
 
 -- --------------------------------------------------------
 
@@ -239,7 +248,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (7, '2026_04_11_103119_create_blog_tables', 1),
 (8, '2026_04_11_103119_create_testimonials_and_faqs_tables', 1),
 (9, '2026_04_11_103120_create_inquiries_and_orders_tables', 1),
-(10, '2026_04_11_103120_create_settings_and_menus_tables', 1);
+(10, '2026_04_11_103120_create_settings_and_menus_tables', 1),
+(11, '2026_04_11_205433_add_service_id_to_page_sections_table', 2);
 
 -- --------------------------------------------------------
 
@@ -285,7 +295,7 @@ CREATE TABLE `pages` (
 --
 
 INSERT INTO `pages` (`id`, `title`, `slug`, `template`, `is_published`, `seo_metadata`, `created_at`, `updated_at`) VALUES
-(1, 'Home', 'home', 'default', 1, NULL, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
+(1, 'Home', 'home', 'default', 1, '{\"title\":null,\"description\":null}', '2026-04-11 07:00:55', '2026-04-11 14:47:51'),
 (2, 'About Us', 'about-us', 'default', 1, NULL, '2026-04-11 07:00:55', '2026-04-11 07:00:55');
 
 -- --------------------------------------------------------
@@ -296,29 +306,41 @@ INSERT INTO `pages` (`id`, `title`, `slug`, `template`, `is_published`, `seo_met
 
 CREATE TABLE `page_sections` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `page_id` bigint(20) UNSIGNED NOT NULL,
+  `page_id` bigint(20) UNSIGNED DEFAULT NULL,
   `type` varchar(255) NOT NULL,
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`content`)),
   `sort_order` int(11) NOT NULL DEFAULT 0,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `service_id` bigint(20) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `page_sections`
 --
 
-INSERT INTO `page_sections` (`id`, `page_id`, `type`, `content`, `sort_order`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 1, 'hero', '{\"title\":\"Elevating Research into Scholarly\",\"italic_title\":\"Art.\",\"subtitle\":\"Professional dissertation consultancy for the modern academic landscape. We transform your rigorous research into a definitive scholarly contribution.\",\"button_label\":\"Inquire for Advisory\",\"image_url\":\"https:\\/\\/lh3.googleusercontent.com\\/aida-public\\/AB6AXuAoje5weV3d7jENut3ainxRhkPPeo_d58HGDxtCiiFHgDOXCoKjXdzjodgZ_GmQ6S1jLw_mJJSlY3umwwHD8dwUZdGh6KNrIR3Pg9ruQo-nKUWjdxb1dnGUFwxmd-90cUvEX26TvJ5pZ_dOwZlBx-uLr21Xk3tnIxYi47mGKkCZ0aeNzEoRSu33ALwOs6qrd3OvRRzyIkuwbSLASd2prX3JhUXVQpt4ku5gjOICfHEnCPZS-9ZDbAhmhrroAWGrBUDZ55_UM8cuRKA\",\"badge_text\":\"London Elite\",\"stat_number\":\"12.5k\",\"stat_label\":\"Theses Refined\"}', 1, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
-(2, 1, 'services_bento', '{\"heading\":\"Our Services\",\"items\":[{\"title\":\"Dissertation Writing\",\"text\":\"Comprehensive support from topic selection to final conclusion. Our experts help you synthesize complex data into a cohesive narrative that meets the highest academic standards.\",\"icon\":\"edit_note\",\"link_label\":\"Explore Service\",\"link\":\"\\/services\\/dissertation-writing\"},{\"title\":\"Editing & Proofreading\",\"text\":\"Fine-tuning your manuscript for clarity, tone, and impeccable grammar.\",\"icon\":\"draw\",\"link_label\":\"Learn More\",\"link\":\"\\/services\\/editing\"},{\"title\":\"Research Proposal\",\"text\":\"Crafting persuasive proposals that secure committee approval and funding.\",\"icon\":\"biotech\",\"link_label\":\"\",\"link\":\"#\"},{\"title\":\"Assignment Help\",\"text\":\"Specialized assistance for complex coursework, case studies, and methodological frameworks. We help you master the material while maintaining academic integrity.\",\"icon\":\"assignment\",\"button_label\":\"Priority Support\",\"is_dark\":true,\"link\":\"#\"}]}', 2, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
-(3, 1, 'why_choose_us', '{\"heading\":\"The Stitch Distinction.\",\"paragraph\":\"Why the worlds most ambitious scholars trust our atelier for their final contributions.\",\"items\":[{\"title\":\"Authority\",\"description\":\"Advisors with PhDs from the worlds leading institutions.\",\"icon\":\"verified\"},{\"title\":\"Integrity\",\"description\":\"Uncompromising standards of academic honesty.\",\"icon\":\"gavel\"}]}', 3, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
-(4, 1, 'progress_ledger', '{\"heading\":\"The Path to Doctorate.\",\"items\":[{\"title\":\"Strategic Brief\",\"description\":\"Initial consultation to map your research goals.\",\"step_number\":\"01\"},{\"title\":\"Developmental Edit\",\"description\":\"Deep dive into structural and logical flow.\",\"step_number\":\"02\"},{\"title\":\"Atelier Refinement\",\"description\":\"Final polish and formatting for submission.\",\"step_number\":\"03\"}]}', 4, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
-(5, 1, 'testimonials', '{\"heading\":\"Scholarly Testimonials\",\"items\":[{\"name\":\"Helena Vance\",\"role\":\"PhD Candidate, Oxford\",\"text\":\"The level of rigor and attention to detail provided by the advisors was instrumental in my successful defense.\",\"rating\":\"5\"},{\"name\":\"James Thorne\",\"role\":\"Assoc. Professor, LSE\",\"text\":\"A true atelier for academic work. They don\'t just edit; they understand the scholarly conversation.\",\"rating\":\"5\"}]}', 5, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
-(6, 1, 'cta_banner', '{\"heading\":\"Elevate your research to the Atelier Standard.\",\"paragraph\":\"Every masterpiece begins with a conversation. Let\'s discuss your contribution to academia.\",\"cta_primary_label\":\"Consult with an Advisor\",\"cta_secondary_label\":\"Review Portfolio\"}', 6, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
-(7, 2, 'hero_about', '{\"badge\":\"Since 2012\",\"title\":\"Elevating Research into\",\"title_italic\":\"Scholarly Art.\",\"subtitle\":\"We exist to bridge the gap between complex research and accessible clarity.\",\"stat_label\":\"Academic Distinction\",\"stat_text\":\"Consistently helping scholars reach the highest tiers of academic recognition.\"}', 1, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
-(8, 2, 'mission_vision', '{\"mission_title\":\"Our Mission\",\"mission_text\":\"To empower scholars with the strategic tools and editorial precision required to leave an indelible mark.\",\"mission_tags\":\"Precision, Authority, Integrity\",\"vision_title\":\"Our Vision\",\"vision_text\":\"To become the world\'s most trusted atelier for academic excellence.\",\"vision_quote\":\"The pursuit of knowledge is a craft; we provide the studio where that craft is perfected.\"}', 2, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55'),
-(9, 2, 'team_grid', '{\"heading\":\"Distinguished Faculty\",\"members\":[{\"name\":\"Dr. Marcus Thorne\",\"role\":\"Technical Editor-in-Chief\",\"bio\":\"Ph.D. MIT. Expert in STEM clarity and structural integrity.\"},{\"name\":\"Dr. Helena Vance\",\"role\":\"Senior Research Strategist\",\"bio\":\"Ph.D. Oxford. Specializes in qualitative methodology and societal impact.\"}]}', 3, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55');
+INSERT INTO `page_sections` (`id`, `page_id`, `type`, `content`, `sort_order`, `is_active`, `created_at`, `updated_at`, `service_id`) VALUES
+(1, 1, 'hero', '{\"badge\":\"Premium Academic Excellence\",\"title\":\"Elevating Research into Scholarly Excellence\",\"title_accent\":\"You Can Trust\",\"subtitle\":\"Professional dissertation consultancy for the modern academic landscape. We transform your rigorous research into a definitive scholarly contribution.\",\"cta_primary_label\":\"Get Started\",\"cta_primary_link\":\"#\",\"cta_secondary_label\":\"Get Free Quote\",\"cta_secondary_link\":\"#\",\"image_url\":\"https:\\/\\/lh3.googleusercontent.com\\/aida-public\\/AB6AXuAoje5weV3d7jENut3ainxRhkPPeo_d58HGDxtCiiFHgDOXCoKjXdzjodgZ_GmQ6S1jLw_mJJSlY3umwwHD8dwUZdGh6KNrIR3Pg9ruQo-nKUWjdxb1dnGUFwxmd-90cUvEX26TvJ5pZ_dOwZlBx-uLr21Xk3tnIxYi47mGKkCZ0aeNzEoRSu33ALwOs6qrd3OvRRzyIkuwbSLASd2prX3JhUXVQpt4ku5gjOICfHEnCPZS-9ZDbAhmhrroAWGrBUDZ55_UM8cuRKA\",\"advisor_name\":\"Dr. Elena Vance\",\"advisor_role\":\"Lead Research Strategist\",\"advisor_quote\":\"\\\"Our mission is to refine your vision...\\\"\",\"advisor_image\":null}', 0, 1, '2026-04-11 07:00:55', '2026-04-11 15:41:39', NULL),
+(2, 1, 'services_bento', '{\"heading\":\"Our Services\",\"items\":[{\"icon\":\"edit_note\",\"title\":\"Dissertation Writing\",\"text\":\"Comprehensive support from topic selection to final conclusion. Our experts help you synthesize complex data into a cohesive narrative that meets the highest academic standards.\",\"link_label\":\"Explore Service\",\"link\":\"\\/services\\/dissertation-writing\",\"button_label\":\"Explore Service\",\"is_dark\":\"1\"},{\"icon\":\"draw\",\"title\":\"Editing & Proofreading\",\"text\":\"Fine-tuning your manuscript for clarity, tone, and impeccable grammar.\",\"link_label\":\"Learn More\",\"link\":\"\\/services\\/editing\",\"button_label\":\"Priority Support\"},{\"icon\":\"biotech\",\"title\":\"Research Proposal\",\"text\":\"Crafting persuasive proposals that secure committee approval and funding.\",\"link_label\":\"Explore Service\",\"link\":\"#\",\"button_label\":\"Priority Support\"},{\"icon\":\"assignment\",\"title\":\"Assignment Help\",\"text\":\"Specialized assistance for complex coursework, case studies, and methodological frameworks. We help you master the material while maintaining academic integrity.\",\"link_label\":\"Explore Service\",\"link\":\"#\",\"button_label\":\"Explore Service\",\"is_dark\":\"1\"}]}', 1, 1, '2026-04-11 07:00:55', '2026-04-11 14:49:17', NULL),
+(3, 1, 'why_choose_us', '{\"heading\":\"Professional Academic Excellence\",\"paragraph\":\"Empowering doctoral candidates through rigorous methodological oversight and scholarly integrity.\",\"image_url\":null,\"stat_value\":\"99%\",\"stat_label\":\"Success Rate\"}', 2, 1, '2026-04-11 07:00:55', '2026-04-11 15:24:09', NULL),
+(4, 1, 'progress_ledger', '{\"heading\":\"Your Path to Excellence\",\"paragraph\":\"A transparent, four-step journey...\",\"steps\":[{\"number\":\"1\",\"title\":\"Submit Requirements\",\"text\":\"Upload your prompts, guidelines, dissertation brief, and any supporting draft materials for expert review.\"},{\"number\":\"2\",\"title\":\"Get Quote\",\"text\":\"Receive a transparent, all-inclusive quotation tailored to your academic needs and project scope.\"},{\"number\":\"3\",\"title\":\"Work in Progress\",\"text\":\"Collaborate directly with your assigned academic expert as your work is developed with precision and care.\"},{\"number\":\"4\",\"title\":\"Delivery\",\"text\":\"Receive your polished, submission-ready academic document prepared to the highest scholarly standards.\"}]}', 3, 1, '2026-04-11 07:00:55', '2026-04-11 15:37:20', NULL),
+(5, 1, 'testimonials', '{\"heading\":\"Scholarly Testimonials\",\"paragraph\":null,\"items\":[{\"name\":\"Helena Vance\",\"role\":\"PhD Candidate, Oxford\",\"text\":\"The level of rigor and attention to detail provided by the advisors was instrumental in my successful defense.\",\"rating\":\"5\"},{\"name\":\"James Thorne\",\"role\":\"Assoc. Professor, LSE\",\"text\":\"A true atelier for academic work. They don\'t just edit; they understand the scholarly conversation.\",\"rating\":\"5\"}]}', 5, 1, '2026-04-11 07:00:55', '2026-04-11 15:29:04', NULL),
+(6, 1, 'cta_banner', '{\"heading\":\"Elevate your research to the Atelier Standard.\",\"paragraph\":\"Every masterpiece begins with a conversation. Let\'s discuss your contribution to academia.\",\"cta_primary_label\":\"Consult with an Advisor\",\"cta_primary_link\":\"#\",\"cta_secondary_label\":\"Review Portfolio\",\"cta_secondary_link\":\"#\"}', 6, 1, '2026-04-11 07:00:55', '2026-04-11 15:29:04', NULL),
+(7, 2, 'hero_about', '{\"badge\":\"Since 2012\",\"title\":\"Elevating Research into\",\"title_italic\":\"Scholarly Art.\",\"subtitle\":\"We exist to bridge the gap between complex research and accessible clarity.\",\"stat_label\":\"Academic Distinction\",\"stat_text\":\"Consistently helping scholars reach the highest tiers of academic recognition.\"}', 1, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55', NULL),
+(8, 2, 'mission_vision', '{\"mission_title\":\"Our Mission\",\"mission_text\":\"To empower scholars with the strategic tools and editorial precision required to leave an indelible mark.\",\"mission_tags\":\"Precision, Authority, Integrity\",\"vision_title\":\"Our Vision\",\"vision_text\":\"To become the world\'s most trusted atelier for academic excellence.\",\"vision_quote\":\"The pursuit of knowledge is a craft; we provide the studio where that craft is perfected.\"}', 2, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55', NULL),
+(9, 2, 'team_grid', '{\"heading\":\"Distinguished Faculty\",\"members\":[{\"name\":\"Dr. Marcus Thorne\",\"role\":\"Technical Editor-in-Chief\",\"bio\":\"Ph.D. MIT. Expert in STEM clarity and structural integrity.\"},{\"name\":\"Dr. Helena Vance\",\"role\":\"Senior Research Strategist\",\"bio\":\"Ph.D. Oxford. Specializes in qualitative methodology and societal impact.\"}]}', 3, 1, '2026-04-11 07:00:55', '2026-04-11 07:00:55', NULL),
+(12, 1, 'stagger_testimonials', '{\"heading\":\"Scholarly Success Stories\",\"paragraph\":\"Join thousands of doctoral candidates who secured their terminal degree with our support.\"}', 4, 1, '2026-04-11 15:29:04', '2026-04-11 15:29:04', NULL),
+(27, NULL, 'hero_side_form', '{\"badge\":\"Elite Academic Consultancy\",\"title\":\"Struggling with Your Dissertation? Get Expert Help That Actually Improves Your Grade.\",\"subtitle\":\"If your dissertation deadline is approaching and you feel stuck or overwhelmed\\u2014you\\u2019re not alone. We provide structured support for students starting from scratch or refining existing drafts to meet supervisor expectations.\",\"image_url\":\"https:\\/\\/images.unsplash.com\\/photo-1524311586216-996417a00fb4?q=80&w=2670\",\"form_title\":\"Request Dissertation Support\",\"form_subtitle\":\"Receive topic refinement and a clear research roadmap.\",\"form_button\":\"Get Free Consultation\",\"cta_label\":\"Review Our Academic Standards\",\"cta_link\":\"#commitment\"}', 0, 1, '2026-04-11 17:04:10', '2026-04-11 20:26:51', 2),
+(28, NULL, 'why_choose_us', '{\"heading\":\"Trusted Support That Delivers Results\",\"paragraph\":\"We support candidates across PhD, Postgraduate, and Undergraduate levels with work aligned to UK university expectations.\",\"image_url\":\"https:\\/\\/images.unsplash.com\\/photo-1517842645767-c6370d6778e0?q=80&w=2670\",\"stat_value\":\"99%\",\"stat_label\":\"Student Approval Rate\",\"highlights\":[{\"icon\":\"edit_note\",\"title\":\"Structured Academic Writing\",\"text\":\"Clear, professionally structured work that meets rigid academic standards.\"},{\"icon\":\"library_books\",\"title\":\"Strong Research\",\"text\":\"Utilising credible scholarly sources and authoritative academic literature.\"},{\"icon\":\"history_edu\",\"title\":\"Accurate Referencing\",\"text\":\"Perfectly formatted citations: Harvard, APA, MLA, OSCOLA.\"},{\"icon\":\"school\",\"title\":\"Tailored Aligned Guidelines\",\"text\":\"Work strictly aligned with your specific university handbook and rubric.\"}]}', 1, 1, '2026-04-11 17:04:10', '2026-04-11 20:26:57', 2),
+(29, NULL, 'cta_banner', '{\"heading\":\"Get a Free Dissertation Plan in Minutes\",\"paragraph\":\"Share your brief to receive research direction, a clear chapter outline, and personalised level-based guidance.\",\"cta_primary_label\":\"Request My Free Plan\",\"cta_secondary_label\":\"Speak to an Advisor\"}', 2, 1, '2026-04-11 17:04:10', '2026-04-11 20:26:57', 2),
+(30, NULL, 'progress_ledger', '{\"heading\":\"A Multi-Stage Curated Process\",\"paragraph\":\"Transparent, rigorous development for your terminal contribution.\",\"steps\":[{\"number\":\"01\",\"title\":\"Share Your Requirements\",\"text\":\"Submit your topic, deadline, and university guidelines for faculty review.\"},{\"number\":\"02\",\"title\":\"Receive a Structured Plan\",\"text\":\"Get a clear approach with a definitive timeline and academic research direction.\"},{\"number\":\"03\",\"title\":\"Work With an Expert\",\"text\":\"Your work is developed step-by-step with senior advisor updates and revisions.\"}]}', 3, 1, '2026-04-11 17:04:10', '2026-04-11 20:26:51', 2),
+(31, NULL, 'feature_grid', '{\"heading\":\"Complete Academic Support Architecture\",\"paragraph\":\"Bespoke services tailored to individual project requirements.\",\"items\":[{\"icon\":\"history_edu\",\"title\":\"Full Dissertation Writing\",\"text\":\"From proposal to submission, covering literature reviews, methodology, and authoritative analysis.\"},{\"icon\":\"edit_document\",\"title\":\"Assignment & Coursework\",\"text\":\"Carefully structured essays, reports, and case studies aligned with your marking criteria.\"},{\"icon\":\"spellcheck\",\"title\":\"Editing & Proofreading\",\"text\":\"Refining clarity, academic tone, structure, and referencing for submission readiness.\"},{\"icon\":\"published_with_changes\",\"title\":\"Resubmission Support\",\"text\":\"Restructuring and improving rejected or low-graded work to meet strict expectations.\",\"is_secondary\":\"1\"}]}', 4, 1, '2026-04-11 17:04:10', '2026-04-11 20:26:51', 2),
+(32, NULL, 'why_choose_us', '{\"heading\":\"The Atelier Standard Commitment\",\"paragraph\":\"Foundational principles of scholarly integrity and student success.\",\"image_url\":\"https:\\/\\/images.unsplash.com\\/photo-1521791136064-7986c2959210?q=80&w=2670\",\"stat_value\":\"100%\",\"stat_label\":\"Originality\",\"highlights\":[{\"icon\":\"verified\",\"title\":\"100% Original Content\",\"text\":\"Custom-written work crafted from scratch for your specific project.\"},{\"icon\":\"lock\",\"title\":\"Confidential & Secure\",\"text\":\"Strict data protocols ensuring total candidate anonymity and safety.\"},{\"icon\":\"chat_bubble\",\"title\":\"Clear Communication\",\"text\":\"Transparent updates and senior advisor contact throughout your venture.\"},{\"icon\":\"flag\",\"title\":\"UK Academic Standards\",\"text\":\"Work strictly aligned with the highest standards of British Higher Education.\"}]}', 5, 1, '2026-04-11 17:04:10', '2026-04-11 20:26:51', 2),
+(33, NULL, 'stagger_testimonials', '{\"heading\":\"Scholarly Success Stories\",\"paragraph\":\"Experiences from doctoral and postgraduate candidates.\",\"items\":[{\"name\":\"Sarah M.\",\"role\":\"PhD Candidate, Social Sciences\",\"quote\":\"\\u201cI was struggling with my dissertation structure and feedback. The guidance I received helped me organise my work properly and improve my final grade.\\u201d\",\"image\":\"https:\\/\\/i.pravatar.cc\\/150?img=1\"},{\"name\":\"James T.\",\"role\":\"Master of Law (LLM)\",\"quote\":\"\\u201cVery helpful and responsive team. My assignment was well-structured, properly referenced, and delivered on time.\\u201d\",\"image\":\"https:\\/\\/i.pravatar.cc\\/150?img=2\"}]}', 6, 1, '2026-04-11 17:04:10', '2026-04-11 20:26:51', 2),
+(34, NULL, 'faq_accordion', '{\"heading\":\"Inquiries & Clarifications\",\"items\":[{\"question\":\"Is the work original?\",\"answer\":\"Yes, every masterpiece is a 100% custom-written scholarly contribution, crafted from scratch and checked for total originality.\"},{\"question\":\"Can you help improve my existing dissertation?\",\"answer\":\"Absolutely. We specialise in refining existing drafts, improving methodology, and ensuring editorial polish.\"},{\"question\":\"Do you follow UK university guidelines?\",\"answer\":\"Yes, all our advisors are experts in UK Higher Education and will align your work strictly with your institution\'s specific rubric.\"}]}', 7, 1, '2026-04-11 17:04:10', '2026-04-11 20:26:51', 2),
+(35, NULL, 'cta', '{\"title\":\"Speak to an Expert Today\",\"text\":\"Get started now to receive urgent help or quick guidance for your terminal project.\",\"button_text\":\"Initiate Consultation\",\"button_link\":\"#hero\"}', 8, 1, '2026-04-11 17:04:10', '2026-04-11 20:26:51', 2),
+(36, NULL, 'hero_side_form', '{\"badge\":\"Scholarly Identity\",\"title\":\"Expert Online Exam Help for UK Students\",\"subtitle\":\"We commonly receive enquiries from students enquiring if paying someone to take an online exam for them is legal. The answer is no. Many UK students seek our online exam assistance to free up time for other courses and activities. Our specialists assure anonymity and provide excellent online exam aid to students from various UK colleges.\",\"image_url\":\"http:\\/\\/127.0.0.1:8000\\/storage\\/images\\/academic-excellence.png\",\"form_title\":\"Reserve Your Consultant\",\"form_subtitle\":\"Personalized support for bespoke research.\",\"form_button\":\"Initiate Consultation\",\"cta_label\":\"Review Our Academic Standards\",\"cta_link\":\"#commitment\"}', 0, 1, '2026-04-11 20:27:19', '2026-04-11 20:27:19', 3);
 
 -- --------------------------------------------------------
 
@@ -404,7 +426,9 @@ CREATE TABLE `services` (
 --
 
 INSERT INTO `services` (`id`, `name`, `slug`, `category_id`, `short_description`, `description`, `features`, `image`, `banner_image`, `is_featured`, `is_published`, `sort_order`, `seo_metadata`, `created_at`, `updated_at`) VALUES
-(1, 'Doctoral Dissertation Editing', 'doctoral-dissertation-editing', 2, 'Comprehensive editorial support for advanced research.', 'Our advisors provide substantive, developmental, and copy-editing tailored to PhD standards.', '[\"Methodology Audit\",\"Citation Verification\",\"Logical Flow Refinement\"]', NULL, NULL, 0, 1, 0, NULL, '2026-04-11 07:00:55', '2026-04-11 07:00:55');
+(1, 'Doctoral Dissertation Editing', 'doctoral-dissertation-editing', 2, 'Comprehensive editorial support for advanced research.', 'Our advisors provide substantive, developmental, and copy-editing tailored to PhD standards.', '[\"Methodology Audit\",\"Citation Verification\",\"Logical Flow Refinement\"]', NULL, NULL, 1, 1, 0, '{\"title\":null,\"description\":null}', '2026-04-11 07:00:55', '2026-04-11 13:53:59'),
+(2, 'Full Dissertation', 'full-dissertation-writing', 1, 'Comprehensive academic support for PhD, PG, and UG dissertation projects.', 'Guided support for dissertation literature reviews, methodology, and final analysis.', '[]', NULL, NULL, 1, 1, 1, '{\"title\":\"Full Dissertation Help | Expert Academic Writing Support\",\"description\":\"Get expert help with your dissertation. Aligned with UK university guidelines, credible research, and accurate referencing.\"}', '2026-04-11 15:59:06', '2026-04-11 20:26:51'),
+(3, 'Online Exam Help', 'online-exam-help', 3, 'We commonly receive enquiries from students enquiring if paying someone to take an online exam for them is legal.', 'We commonly receive enquiries from students enquiring if paying someone to take an online exam for them is legal. The answer is no. Many UK students seek our online exam assistance to free up time for other courses and activities. Our specialists assure anonymity and provide excellent online exam aid to students from various UK colleges.', '[]', NULL, NULL, 0, 1, 0, '{\"title\":\"testtt\",\"description\":\"testestest\"}', '2026-04-11 20:04:44', '2026-04-11 20:27:19');
 
 -- --------------------------------------------------------
 
@@ -426,7 +450,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('kqi9vPaSN72HSuPmrKzqZrEifGArzNnQqm6GWULm', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiV2dNeDRLYUxqVWdUeE9SUFcyV3N1UERGWXlvSDZ5VERqY0RKWnJBaCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9wYWdlcy8yL2VkaXQiO3M6NToicm91dGUiO3M6MTY6ImFkbWluLnBhZ2VzLmVkaXQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1775908924);
+('08liLLceS9p5NpJSewQGhzHt2GBqAuc56rSDtQLg', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiakNsRkZqaFY2cnA4MkliQ0ZERFlkWXFNT2gwQUEwakhDRTF2V3dHWiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NTY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9zZXJ2aWNlcy9mdWxsLWRpc3NlcnRhdGlvbi13cml0aW5nIjtzOjU6InJvdXRlIjtzOjEzOiJzZXJ2aWNlcy5zaG93Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1775957939);
 
 -- --------------------------------------------------------
 
@@ -610,7 +634,8 @@ ALTER TABLE `pages`
 --
 ALTER TABLE `page_sections`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `page_sections_page_id_foreign` (`page_id`);
+  ADD KEY `page_sections_page_id_foreign` (`page_id`),
+  ADD KEY `page_sections_service_id_foreign` (`service_id`);
 
 --
 -- Indexes for table `password_reset_tokens`
@@ -704,7 +729,7 @@ ALTER TABLE `faqs`
 -- AUTO_INCREMENT for table `inquiries`
 --
 ALTER TABLE `inquiries`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `jobs`
@@ -728,7 +753,7 @@ ALTER TABLE `menu_items`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `orders`
@@ -746,7 +771,7 @@ ALTER TABLE `pages`
 -- AUTO_INCREMENT for table `page_sections`
 --
 ALTER TABLE `page_sections`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `posts`
@@ -764,7 +789,7 @@ ALTER TABLE `post_tag`
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `settings`
@@ -811,7 +836,8 @@ ALTER TABLE `orders`
 -- Constraints for table `page_sections`
 --
 ALTER TABLE `page_sections`
-  ADD CONSTRAINT `page_sections_page_id_foreign` FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `page_sections_page_id_foreign` FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `page_sections_service_id_foreign` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `posts`

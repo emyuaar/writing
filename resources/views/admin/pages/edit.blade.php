@@ -7,13 +7,15 @@
         <p class="text-slate-400 text-sm">Manage sections and content for this page.</p>
     </div>
     <div class="flex gap-3">
-        <a href="{{ route('admin.pages.index') }}" class="btn btn-secondary">
-            <span class="material-symbols-outlined mr-2">arrow_back</span>
-            Back
+        <a href="{{ route('admin.pages.index') }}" class="px-6 py-2.5 rounded-lg border border-slate-200 text-slate-600 font-bold text-sm bg-white hover:bg-slate-50 transition-colors">
+            Cancel
         </a>
-        <button form="page-edit-form" type="submit" class="btn btn-primary">
-            <span class="material-symbols-outlined mr-2">save</span>
-            Save Changes
+        <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="px-6 py-2.5 rounded-lg border border-primary/20 text-primary font-bold text-sm bg-primary/5 hover:bg-primary/10 transition-colors flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">open_in_new</span>
+            Preview Live Page
+        </a>
+        <button form="page-edit-form" type="submit" class="px-8 py-2.5 rounded-lg bg-primary text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all">
+            Publish Changes
         </button>
     </div>
 </div>
@@ -44,6 +46,7 @@
                 </div>
 
                 <div id="sections-container" class="space-y-6">
+                    <input type="hidden" name="sections_builder_active" value="1">
                     @foreach($page->sections as $index => $section)
                         @include('admin.sections.form_wrapper', [
                             'section' => $section,
@@ -100,57 +103,29 @@
                 <p class="text-xs text-slate-500 leading-relaxed">
                     <strong>Pro Tip:</strong> Reorder sections by dragging the handle. Changes are only permanent after clicking <strong>Save Changes</strong>.
                 </p>
-            </div>
-        </div>
-    </div>
 </form>
 
 @push('styles')
 <style>
-    /* Scoped Tailwind-like utils for builder */
-    .flex { display: flex; }
-    .flex-col { flex-direction: column; }
-    .items-center { align-items: center; }
-    .justify-between { justify-content: space-between; }
-    .gap-2 { gap: 0.5rem; }
-    .gap-3 { gap: 0.75rem; }
-    .gap-4 { gap: 1rem; }
-    .space-y-6 > * + * { margin-top: 1.5rem; }
-    .space-y-4 > * + * { margin-top: 1rem; }
-    .mr-2 { margin-right: 0.5rem; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .mb-6 { margin-bottom: 1.5rem; }
-    .mb-8 { margin-bottom: 2rem; }
-    .pt-8 { border-top-width: 1px; padding-top: 2rem; }
-    .p-6 { padding: 1.5rem; }
-    .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-    .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-    .rounded-lg { border-radius: 0.5rem; }
-    .rounded-xl { border-radius: 0.75rem; }
-    .bg-white { background-color: #ffffff; }
-    .bg-slate-50 { background-color: #f8fafc; }
-    .border { border: 1px solid #e2e8f0; }
-    .border-b { border-bottom: 1px solid #e2e8f0; }
-    .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-    .text-sm { font-size: 0.875rem; }
-    .text-xs { font-size: 0.75rem; }
-    .font-bold { font-weight: 700; }
-    .uppercase { text-transform: uppercase; }
-    .tracking-widest { letter-spacing: 0.1em; }
-    .tracking-wide { letter-spacing: 0.025em; }
-    .text-slate-400 { color: #94a3b8; }
-    .text-slate-600 { color: #475569; }
-    .text-slate-700 { color: #334155; }
-    .overflow-hidden { overflow: hidden; }
-    
     /* Builder Specific */
     .section-handle { cursor: grab; }
     .section-handle:active { cursor: grabbing; }
-    .section-content.collapsed { display: none; }
-    
-    .repeater-item { border: 1px solid #e2e8f0; border-radius: 0.5rem; margin-bottom: 1rem; }
 </style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        corePlugins: {
+            preflight: false,
+        },
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#000B20',
+                }
+            }
+        }
+    }
+</script>
 @endpush
 
 @push('scripts')
@@ -160,75 +135,84 @@
         const container = document.getElementById('sections-container');
         
         // Initialize Drag and Drop
-        new Sortable(container, {
-            handle: '.section-handle',
-            animation: 150,
-            ghostClass: 'bg-slate-100',
-            onEnd: function() {
-                reindexSections();
-            }
-        });
+        if (container) {
+            new Sortable(container, {
+                handle: '.section-handle',
+                animation: 250,
+                ghostClass: 'bg-slate-100',
+                onEnd: function() { reindexSections(); }
+            });
+        }
 
         // Add Section
-        document.getElementById('add-section-btn').addEventListener('click', function() {
-            const selector = document.getElementById('section-type-selector');
-            const type = selector.value;
-            if (!type) return;
+        const addSectionBtn = document.getElementById('add-section-btn');
+        if(addSectionBtn) {
+            addSectionBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const selector = document.getElementById('section-type-selector');
+                const type = selector.value;
+                if (!type) return;
 
-            const index = container.querySelectorAll('.section-item').length;
-            
-            fetch(`{{ route('admin.pages.sections.get-form') }}?type=${type}&index=${index}`)
-                .then(response => response.text())
-                .then(html => {
-                    if (container.querySelector('.empty-state')) {
-                        container.querySelector('.empty-state').remove();
-                    }
-                    container.insertAdjacentHTML('beforeend', html);
-                    selector.value = '';
-                });
-        });
+                const index = container.querySelectorAll('.section-item').length;
+                
+                fetch(`{{ route('admin.pages.sections.get-form') }}?type=${type}&index=${index}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        if (container.querySelector('.empty-state')) {
+                            container.querySelector('.empty-state').remove();
+                        }
+                        container.insertAdjacentHTML('beforeend', html);
+                        selector.value = '';
+                    });
+            });
+        }
 
         // Event Delegation for Section Controls
-        container.addEventListener('click', function(e) {
-            // Remove Section
-            if (e.target.closest('.remove-section')) {
-                if (confirm('Are you sure you want to remove this section?')) {
-                    e.target.closest('.section-item').remove();
-                    reindexSections();
+        if(container) {
+            container.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-section')) {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to remove this section?')) {
+                        e.target.closest('.section-item').remove();
+                        reindexSections();
+                    }
                 }
-            }
 
-            // Toggle Collapse
-            if (e.target.closest('.toggle-section')) {
-                const btn = e.target.closest('.toggle-section');
-                const content = btn.closest('.section-item').querySelector('.section-content');
-                const icon = btn.querySelector('.material-symbols-outlined');
-                
-                content.classList.toggle('collapsed');
-                icon.style.transform = content.classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0deg)';
-            }
+                // 3. Toggle Collapse
+                if (e.target.closest('.toggle-section')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('.toggle-section');
+                    const content = btn.closest('.section-item').querySelector('.section-content');
+                    const icon = btn.querySelector('.material-symbols-outlined');
+                    
+                    content.classList.toggle('hidden');
+                    if(icon) {
+                        icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(-180deg)';
+                    }
+                }
 
-            // Add Repeater Item
-            if (e.target.closest('.add-repeater-item')) {
-                const btn = e.target.closest('.add-repeater-item');
-                const repeater = btn.closest('.repeater-field');
-                const itemsContainer = repeater.querySelector('.repeater-items');
-                const template = repeater.querySelector('.repeater-item-template').innerHTML;
-                
-                const itemIndex = itemsContainer.querySelectorAll('.repeater-item').length;
-                const html = template.replace(/__ITEM_INDEX__/g, itemIndex);
-                
-                itemsContainer.insertAdjacentHTML('beforeend', html);
-            }
+                // 4. Add Repeater Item
+                if (e.target.closest('.add-repeater-item')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('.add-repeater-item');
+                    const repeater = btn.closest('.repeater-field');
+                    const itemsContainer = repeater.querySelector('.repeater-items');
+                    const template = repeater.querySelector('.repeater-item-template').innerHTML;
+                    
+                    const itemIndex = itemsContainer.querySelectorAll('.repeater-item').length;
+                    const html = template.replace(/__ITEM_INDEX__/g, itemIndex);
+                    
+                    itemsContainer.insertAdjacentHTML('beforeend', html);
+                }
 
-            // Remove Repeater Item
-            if (e.target.closest('.remove-repeater-item')) {
-                e.target.closest('.repeater-item').remove();
-                // We don't necessarily need to reindex sub-items unless the order matters greatly, 
-                // but let's keep it simple for now.
-            }
-        });
-
+                // 5. Remove Repeater Item
+                if (e.target.closest('.remove-repeater-item')) {
+                    e.preventDefault();
+                    e.target.closest('.repeater-item').remove();
+                }
+            });
+        }
+        
         function reindexSections() {
             container.querySelectorAll('.section-item').forEach((item, index) => {
                 // Update names for top-level inputs

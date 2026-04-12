@@ -32,4 +32,9 @@ class Service extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function sections()
+    {
+        return $this->hasMany(PageSection::class)->orderBy('sort_order');
+    }
 }

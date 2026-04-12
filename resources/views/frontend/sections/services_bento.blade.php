@@ -2,7 +2,7 @@
     $content = $section->content ?? [];
 @endphp
 
-<section class="bg-[#F6F8FF] py-24 px-8">
+<section class="bg-[#F6F8FF] py-16 sm:py-24 px-4 sm:px-8">
     <div class="max-w-7xl mx-auto">
         <div class="mb-16">
             <h2 class="font-headline text-3xl font-bold text-[#151B2D] mb-4">
@@ -21,7 +21,7 @@
                         $isDark = $item['is_dark'] ?? false;
                     @endphp
                     
-                    <div class="{{ $span }} {{ $isDark ? 'bg-[#0B1E3B] text-white' : 'bg-white text-[#151B2D]' }} p-12 border border-[#E2E8F0] min-h-[320px] relative overflow-hidden flex flex-col justify-between">
+                    <div class="{{ $span }} {{ $isDark ? 'bg-[#0B1E3B] text-white' : 'bg-white text-[#151B2D]' }} p-8 sm:p-12 border border-[#E2E8F0] min-h-[auto] sm:min-h-[320px] relative overflow-hidden flex flex-col justify-between">
                         <div>
                             <span class="material-symbols-outlined text-3xl {{ $isDark ? 'text-gold' : 'text-[#151B2D]' }} mb-8" style="font-variation-settings: 'wght' 700;">
                                 {{ $item['icon'] ?? 'history_edu' }}
